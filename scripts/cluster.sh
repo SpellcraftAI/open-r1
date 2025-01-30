@@ -49,7 +49,7 @@ for instance_name in "${instance_names[@]}"; do
   (
   gcloud compute ssh "$instance_name" \
     --zone="$zone" \
-    --command "source /etc/profile.d/env.sh && killall -9 /opt/conda/bin/python 2>/dev/null || true && ulimit -n 10000 && cd ~/open-r1 && ./scripts/train.sh"
+    --command "source /etc/profile.d/env.sh && killall -9 /opt/conda/bin/python 2>/dev/null || true && ulimit -n 10000 && cd ~/open-r1 && NCCL_DEBUG=INFO PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True ./scripts/train.sh"
   ) &
 
   # Capture the PID of this background job.
