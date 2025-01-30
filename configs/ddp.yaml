@@ -10,6 +10,9 @@ machine_rank: 0
 main_process_ip: 10.128.0.14
 main_process_port: 6969
 
+num_machines: 8
+num_processes: 64
+
 rdzv_backend: static
 same_network: true
 tpu_env: []
