@@ -46,9 +46,7 @@ for instance_name in "${instance_names[@]}"; do
   # Run the SSH command in a sub-shell in the background (&).
   # - The remote process will stop if SSH is killed (which happens if we Ctrl+C).
   (
-    gcloud compute ssh "$instance_name" \
-      --zone="$zone" \
-      --command "cd ~/open-r1 && ./scripts/train.sh"
+     gcloud compute ssh "$instance_name" --zone="$zone" --command "source /etc/profile.d/env.sh && killall -9 /opt/conda/bin/python && cd ~/open-r1 && ./scripts/train.sh"
   ) &
 
   # Capture the PID of this background job.
