@@ -45,10 +45,10 @@ for instance_name in "${instance_names[@]}"; do
 
   # Run the SSH command in a sub-shell in the background (&).
   # - The remote process will stop if SSH is killed (which happens if we Ctrl+C).
+  #  add NCCL_DEBUG=INFO for debug
   (
   gcloud compute ssh "$instance_name" \
     --zone="$zone" \
-    #  add NCCL_DEBUG=INFO for debug
     --command "source /etc/profile.d/env.sh && killall -9 /opt/conda/bin/python 2>/dev/null || true && ulimit -n 10000 && cd ~/open-r1 && ./scripts/train.sh"
   ) &
 
