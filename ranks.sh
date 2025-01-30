@@ -31,8 +31,8 @@ while IFS= read -r line; do
   # SSH in: do a git pull, then sed replacement of machine_rank and main_process_ip
   gcloud compute ssh "$instance_name" --zone="$zone" --command "
     cd ~/open-r1 && git pull && \
-    sed -i 's|^machine_rank: .*|machine_rank: $rank|'  ~/open-r1/configs/*.yml && \
-    sed -i 's|^main_process_ip: .*|main_process_ip: $master_ip|'  ~/open-r1/configs/*.yml
+    sed -i 's|^machine_rank: .*|machine_rank: $rank|'  ~/open-r1/configs/* && \
+    sed -i 's|^main_process_ip: .*|main_process_ip: $master_ip|'  ~/open-r1/configs/*
   "
 
   rank=$((rank + 1))
