@@ -48,7 +48,7 @@ for instance_name in "${instance_names[@]}"; do
   (
     gcloud compute ssh "$instance_name" \
       --zone="$zone" \
-      --command "source ~/.bashrc && cd ~/open-r1 && ./scripts/train.sh"
+      --command "cd ~/open-r1 && ./scripts/train.sh"
   ) &
 
   # Capture the PID of this background job.
