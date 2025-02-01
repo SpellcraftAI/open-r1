@@ -74,7 +74,7 @@ export LAUNCHER="HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORM
 export NCCL_ASYNC_ERROR_HANDLING=1
 
 clear;
-bash -c "$LAUNCHER $CMD" 2>&1;
+bash -c "$LAUNCHER $CMD";
 # clear; srun $SRUN_ARGS --jobid $SLURM_JOB_ID bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD" 2>&1
 
 echo "END TIME: $(date)"
