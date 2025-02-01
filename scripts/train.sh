@@ -86,7 +86,7 @@ export NCCL_ASYNC_ERROR_HANDLING=1
 
 # Specific configuration optimized for the Hugging Face Compute Cluster
 # Be ye warned this may not work on other clusters!
-module load cuda/12.1
+# module load cuda/12.1
 
 # srun error handling:
 # --wait=60: wait 60 sec after the first task terminates before terminating all remaining tasks
@@ -97,7 +97,7 @@ SRUN_ARGS=" \
     "
 
 clear;
-bash -c "$LAUNCHER $CMD" 
+bash -c "$LAUNCHER $CMD deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B AI-MO/NuminaMath-TIR grpo" 
 # clear; srun $SRUN_ARGS --jobid $SLURM_JOB_ID bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD" 2>&1
 
 echo "END TIME: $(date)"
