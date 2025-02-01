@@ -35,9 +35,9 @@ source ~/.bashrc
 echo "START TIME: $(date)"
 echo "PYTHON ENV: $(which python)"
 
-MODEL_PATH=$1
-DATASET_PATH=$2
-ACCELERATOR=$3
+MODEL_PATH=deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B
+DATASET_PATH=AI-MO/NuminaMath-TIR
+ACCELERATOR=grpo
 
 
 # so processes know who to talk to
@@ -97,7 +97,7 @@ SRUN_ARGS=" \
     "
 
 clear;
-bash -c "$LAUNCHER $CMD deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B AI-MO/NuminaMath-TIR grpo" 
+bash -c "$LAUNCHER $CMD" 
 # clear; srun $SRUN_ARGS --jobid $SLURM_JOB_ID bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD" 2>&1
 
 echo "END TIME: $(date)"
