@@ -15,6 +15,5 @@ echo "Options:: $@"
 
 ACCELERATE_LOG_LEVEL=info accelerate launch \
     --config_file recipes/accelerate_configs/zero3.yaml \
-    $@ \
     src/open_r1/grpo.py \
     --config recipes/qwen/Qwen2.5-1.5B-Instruct/grpo/confg_full.yaml
