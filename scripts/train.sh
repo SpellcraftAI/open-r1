@@ -67,6 +67,7 @@ export CMD=" \
 export LAUNCHER="HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
     --config_file recipes/accelerate_configs/$ACCELERATOR.yaml  \
     $@ \
+    --num_processes 14 \
     --gradient_accumulation_steps 4 \
     --max_restarts 1 \
     --role \$(hostname -s): \
