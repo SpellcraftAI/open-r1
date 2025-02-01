@@ -51,13 +51,13 @@ for instance_name in "${instance_names[@]}"; do
 
   # SSH into the instance:
   #  1) Pull latest code in ~/open-r1
-  #  2) Update machine_rank and main_process_ip lines in ~/open-r1/configs/*.yml
+  #  2) Update machine_rank and main_process_ip lines in ~/open-r1/recipes/accelerate_configs/*.yml
   gcloud compute ssh "$instance_name" --zone="$zone" --command "
     echo 'Running git pull in ~/open-r1...'
     cd ~/open-r1 && git reset HEAD --hard && git pull --no-rebase && \
     echo 'Updating machine_rank=$rank, main_process_ip=$master_ip in configs...' && \
-    sed -i 's|^machine_rank: .*|machine_rank: $rank|'  ~/open-r1/configs/* && \
-    sed -i 's|^main_process_ip: .*|main_process_ip: $master_ip|'  ~/open-r1/configs/*
+    sed -i 's|^machine_rank: .*|machine_rank: $rank|'  ~/open-r1/recipes/accelerate_configs/* && \
+    sed -i 's|^main_process_ip: .*|main_process_ip: $master_ip|'  ~/open-r1/recipes/accelerate_configs/*
   "
 
   rank=$((rank + 1))
