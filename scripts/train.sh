@@ -55,9 +55,6 @@ export CMD=" \
     --gradient_accumulation_steps 4 \
     --gradient_checkpointing \
     --bf16 \
-    --use_vllm \
-    --vllm_device auto \
-    --vllm_gpu_memory_utilization 0.7 \
     --logging_steps 5 \
     --eval_strategy steps \
     --eval_steps 100 \
@@ -67,7 +64,6 @@ export CMD=" \
 export LAUNCHER="HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
     --config_file recipes/accelerate_configs/$ACCELERATOR.yaml  \
     $@ \
-    --num_processes 7 \
     --gradient_accumulation_steps 4 \
     --max_restarts 1 \
     --role \$(hostname -s): \
