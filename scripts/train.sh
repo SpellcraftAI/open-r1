@@ -3,6 +3,7 @@ source ~/.bashrc
 echo "Options:: $@"
 
 accelerate launch --config_file recipes/accelerate_configs/zero3.yaml src/open_r1/grpo.py \
+    --config=recipes/qwen/Qwen2.5-1.5B-Instruct/grpo/confg_full.yaml \
     --output_dir DeepSeek-R1-Distill-Qwen-7B-GRPO \
     --model_name_or_path deepseek-ai/DeepSeek-R1-Distill-Qwen-7B \
     --dataset_name AI-MO/NuminaMath-TIR \
