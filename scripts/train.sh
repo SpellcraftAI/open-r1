@@ -28,8 +28,6 @@ echo "Options:: $@"
 #SBATCH --output=./logs/%x-%j.out
 #SBATCH --err=./logs/%x-%j.err
 
-set -x -e
-
 source ~/.bashrc
 # conda activate openr1
 echo "START TIME: $(date)"
