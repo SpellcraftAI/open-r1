@@ -75,7 +75,7 @@ for instance_name in "${instance_names[@]}"; do
       killall -9 /opt/conda/bin/python 2>/dev/null || true && \
       ulimit -n 10000 && \
       cd ~/open-r1 && \
-      ./scripts/train.sh --machine_rank $rank --num_machines $num_nodes --master_ip ${instance_ips[0]}"
+      ./scripts/train.sh --machine_rank $rank --num_machines $num_nodes --num_processes=$((8 * $num_nodes)) --master_ip ${instance_ips[0]}"
   ) &
 
   # Capture the PID of this background job.
