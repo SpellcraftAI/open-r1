@@ -7,14 +7,34 @@ GROUP_ZONE="us-central1-c"
 echo "Fetching instance names from unmanaged instance group '$INSTANCE_GROUP' in zone '$GROUP_ZONE'..."
 instances=$(gcloud compute instance-groups unmanaged list-instances "$INSTANCE_GROUP" \
   --zone="$GROUP_ZONE" \
-  --format="value(NAME)")
+  --format="value(NAME) ")
 
-# Convert the multiline list of instance names into a Bash array.
-IFS=$'\n' read -r -d '' -a instance_names <<< "$instances" || true
+# Convert the whitespace-separated list of instance names into a Bash array.
+read -r -a instance_names <<< "$instances"
 
 echo "Found ${#instance_names[@]} instances:"
 printf "  %s\n" "${instance_names[@]}"
 echo ""
+
+# We'll use a parallel array for instance IP addresses.
+instance_ips=()
+
+echo "Fetching IP addresses for each instance using 'gcloud compute instances list'..."
+for instance in "${instance_names[@]}"; do
+  # Using a filter on the instance name and zone to get the external IP.
+  ip=$(gcloud compute instances list \
+         --filter="name=(${instance}) AND zone:(${GROUP_ZONE})" \
+         --format="value(EXTERNAL_IP)")
+  instance_ips+=( "$ip" )
+  echo "  $instance => $ip"
+done
+
+echo ""
+echo "Summary of instances with their IP addresses:"
+# Loop over the array indices to print corresponding entries.
+for i in "${!instance_names[@]}"; do
+  printf "  %s: %s\n" "${instance_names[$i]}" "${instance_ips[$i]}"
+done
 
 # We'll keep track of background PIDs in this array.
 pids=()
@@ -33,6 +53,8 @@ cleanup() {
 # Trap SIGINT (Ctrl+C) and SIGTERM and run 'cleanup'.
 trap cleanup INT TERM
 
+rank=0
+num_nodes=${#instance_names[@]}
 # Start each SSH job in the background.
 for instance_name in "${instance_names[@]}"; do
   # If all are in the same zone, you can skip this next lookup.
@@ -49,11 +71,16 @@ for instance_name in "${instance_names[@]}"; do
   (
   gcloud compute ssh "$instance_name" \
     --zone="$zone" \
-    --command "source /etc/profile.d/env.sh && killall -9 /opt/conda/bin/python 2>/dev/null || true && ulimit -n 10000 && cd ~/open-r1 && ./scripts/train.sh"
+    --command "source /etc/profile.d/env.sh && \
+      killall -9 /opt/conda/bin/python 2>/dev/null || true && \
+      ulimit -n 10000 && \
+      cd ~/open-r1 && \
+      ./scripts/train.sh --machine_rank $rank --num_machines $num_nodes --master_ip ${instance_ips[0]}"
   ) &
 
   # Capture the PID of this background job.
   pids+=($!)
+  rank=$((rank + 1))
 done
 
 # Wait for all background jobs to finish (or until we Ctrl+C).
