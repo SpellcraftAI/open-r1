@@ -97,7 +97,7 @@ SRUN_ARGS=" \
     "
 
 clear;
-bash -c "$LAUNCHER $CMD" 
+$LAUNCHER $CMD;
 # clear; srun $SRUN_ARGS --jobid $SLURM_JOB_ID bash -c "$LAUNCHER --role \$SLURMD_NODENAME: $CMD" 2>&1
 
 echo "END TIME: $(date)"
