@@ -58,7 +58,7 @@ for instance_name in "${instance_names[@]}"; do
   gcloud compute ssh "$instance_name" --zone="$zone" --command "
     source ~/.bashrc
     source /etc/profile.d/env.sh
-    
+
     echo 'Running git pull in ~/open-r1...'
     cd ~/open-r1
     git reset HEAD --hard && git pull --no-rebase && \
@@ -66,7 +66,7 @@ for instance_name in "${instance_names[@]}"; do
     sed -i 's|^machine_rank: .*|machine_rank: $rank|'  ~/open-r1/recipes/accelerate_configs/* && \
     sed -i 's|^main_process_ip: .*|main_process_ip: $master_ip|'  ~/open-r1/recipes/accelerate_configs/*
 
-    pip install -e ".[dev]"
+    #pip install -e ".[dev]"
   "
 
   rank=$((rank + 1))
