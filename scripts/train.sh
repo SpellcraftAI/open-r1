@@ -42,6 +42,8 @@ ACCELERATOR=zero3
 # MASTER_ADDR=$(scontrol show hostnames $SLURM_JOB_NODELIST | head -n 1)
 # MASTER_PORT=6000
 
+GRADIENT_ACC_STEPS=16
+
 export CMD=" \
     src/open_r1/grpo.py \
     --model_name_or_path $MODEL_PATH \
@@ -52,7 +54,7 @@ export CMD=" \
     --max_prompt_length 512 \
     --per_device_train_batch_size 1 \
     --per_device_eval_batch_size 4 \
-    --gradient_accumulation_steps 16 \
+    --gradient_accumulation_steps $GRADIENT_ACC_STEPS \
     --gradient_checkpointing \
     --bf16 \
     --logging_steps 5 \
@@ -64,7 +66,7 @@ export CMD=" \
 export LAUNCHER="HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
     --config_file recipes/accelerate_configs/$ACCELERATOR.yaml  \
     $@ \
-    --gradient_accumulation_steps 4 \
+    --gradient_accumulation_steps $GRADIENT_ACC_STEPS \
     --max_restarts 1 \
     --role \$(hostname -s): \
     --tee 3 \
