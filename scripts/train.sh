@@ -55,7 +55,6 @@ export CMD=" \
     --per_device_train_batch_size 1 \
     --per_device_eval_batch_size 1 \
     --gradient_accumulation_steps $GRADIENT_ACC_STEPS \
-    --gradient_checkpointing \
     --bf16 \
     --logging_steps 5 \
     --eval_strategy steps \
