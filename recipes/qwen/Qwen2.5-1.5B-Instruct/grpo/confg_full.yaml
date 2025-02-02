@@ -8,7 +8,7 @@ dataset_name: AI-MO/NuminaMath-TIR
 dataset_configs:
 - all
 # Num processes is less by 1 as vLLM is using 1 GPU
-num_processes: 8
+# num_processes: 8
 
 # GRPO trainer config
 bf16: true
@@ -19,14 +19,14 @@ do_eval: true
 eval_strategy: steps
 eval_steps: 100
 gradient_accumulation_steps: 16
-gradient_checkpointing: true
-gradient_checkpointing_kwargs:
-  use_reentrant: false
+# gradient_checkpointing: true
+# gradient_checkpointing_kwargs:
+#   use_reentrant: false
 hub_model_id: Qwen2.5-1.5B-Open-R1-GRPO
 hub_strategy: every_save
 learning_rate: 2.0e-05
 log_level: info
-logging_steps: 10
+logging_steps: 1
 logging_strategy: steps
 lr_scheduler_type: cosine
 max_prompt_length: 512
