@@ -82,6 +82,8 @@ def accuracy_reward(completions, solution, **kwargs):
             
             try:
                 # Reward 1 if the content is the same as the ground truth, 0 otherwise
+                print("ANSWER:", answer_parsed)
+                print("GOLD:", gold_parsed)
                 reward = float(verify(answer_parsed, gold_parsed))
             except Exception as e:
                 print("Failed to verify answer: ", content)
