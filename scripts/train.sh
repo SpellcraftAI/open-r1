@@ -66,7 +66,7 @@ export LAUNCHER="HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORM
     --config_file recipes/accelerate_configs/$ACCELERATOR.yaml  \
     $@ \
     --gradient_accumulation_steps $GRADIENT_ACC_STEPS \
-    --max_restarts 1 \
+    --max_restarts 0 \
     --role \$(hostname -s): \
     --tee 3 \
     "
