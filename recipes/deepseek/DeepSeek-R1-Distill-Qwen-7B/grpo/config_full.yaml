@@ -8,13 +8,13 @@ dataset_name: AI-MO/NuminaMath-TIR
 dataset_configs:
 - all
 # Num processes is less by 1 as vLLM is using 1 GPU
-num_processes: 7
+# num_processes: 7
 
 # GRPO trainer config
 bf16: true
-use_vllm: true
-vllm_device: auto
-vllm_gpu_memory_utilization: 0.7
+# use_vllm: true
+# vllm_device: auto
+# vllm_gpu_memory_utilization: 0.7
 do_eval: true
 eval_strategy: steps
 eval_steps: 100
