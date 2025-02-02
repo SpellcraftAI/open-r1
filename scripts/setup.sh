@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+# Ensure pushed
+git push
+
 # The name of your unmanaged instance group
 INSTANCE_GROUP="open-r1-2x"
 # The zone that the instance group is in

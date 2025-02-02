@@ -11,24 +11,20 @@ instances=$(gcloud compute instance-groups unmanaged list-instances "$INSTANCE_G
 
 # Convert the multiline list of instance names into a Bash array.
 IFS=$'\n' read -r -d '' -a instance_names <<< "$instances" || true
-echo "Found ${#instance_names[@]} instances:"
-printf "  %s\n" "${instance_names[@]}"
-echo ""
 
-if [[ ${#instance_names[@]} -lt 4 ]]; then
-  echo "ERROR: We need at least 4 instances for a 4-panel layout."
+num_instances=${#instance_names[@]}
+if [[ $num_instances -eq 0 ]]; then
+  echo "ERROR: No instances found."
   exit 1
 fi
 
-# Take the first 4 instances
-first_four=("${instance_names[@]:0:4}")
-echo "Using these 4 instances for a 4-panel nvidia-smi:"
-printf "  %s\n" "${first_four[@]}"
+echo "Found $num_instances instance(s):"
+printf "  %s\n" "${instance_names[@]}"
 echo ""
 
 # A cleanup function to kill the tmux session on Ctrl+C / SIGTERM
 cleanup() {
-  echo "Caught Ctrl+C (or SIGTERM). Killing tmux session..."
+  echo "Caught interrupt. Killing tmux session..."
   tmux kill-session -t nvidia || true
   echo "Session killed. Exiting..."
   exit 0
@@ -38,36 +34,42 @@ trap cleanup INT TERM
 # This is the command each pane will run: first kill any existing nvidia-smi, then watch.
 ssh_command="killall nvidia-smi 2> /dev/null; watch -n 1 nvidia-smi"
 
-# We do a simple 2x2 layout with a for-loop: 0..3
-for i in {0..3}; do
-  if [[ $i -eq 0 ]]; then
-    # Create a new tmux session in detached mode for the first instance
-    tmux new-session -d -s nvidia -n "gpu-monitor" \
-      "gcloud compute ssh \"${first_four[$i]}\" \
-         --zone=\"$GROUP_ZONE\" \
-         -- -t '$ssh_command'"
-  elif [[ $i -eq 1 ]]; then
-    # Split horizontally for the second instance
-    tmux split-window -h \
-      "gcloud compute ssh \"${first_four[$i]}\" \
-         --zone=\"$GROUP_ZONE\" \
-         -- -t '$ssh_command'"
-  elif [[ $i -eq 2 ]]; then
-    # Split vertically for the third instance
-    tmux split-window -v \
-      "gcloud compute ssh \"${first_four[$i]}\" \
-         --zone=\"$GROUP_ZONE\" \
-         -- -t '$ssh_command'"
+SESSION="nvidia"
+WINDOW="gpu-monitor"
+
+# Start a new tmux session using the first instance.
+first_instance="${instance_names[0]}"
+tmux new-session -d -s "$SESSION" -n "$WINDOW" \
+  "gcloud compute ssh \"${first_instance}\" --zone=\"$GROUP_ZONE\" -- -t '$ssh_command'"
+
+# Keep track of the “left” pane for the current row.
+# We assume the session’s first (and only) pane is our current row’s left pane.
+row_left_pane="$(tmux display-message -p -t ${SESSION}:$WINDOW '#{pane_id}')"
+
+# Process the remaining instances.
+# We'll loop over instance_names[1..n-1] and for each row, add a partner (if available) via horizontal split.
+# Then if more instances remain, start a new row by vertically splitting the left pane of the current row.
+for (( i=1; i<num_instances; i++ )); do
+  # For even i (i.e. odd-numbered instance, second in the row) add a horizontal split.
+  if (( i % 2 == 1 )); then
+    # Split horizontally in the current row.
+    tmux select-pane -t "$row_left_pane"
+    tmux split-window -h -t "$row_left_pane" \
+      "gcloud compute ssh \"${instance_names[i]}\" --zone=\"$GROUP_ZONE\" -- -t '$ssh_command'"
   else
-    # i = 3: split the top-left pane again to get a 2x2 layout
-    tmux select-pane -t 0
-    tmux split-window -v \
-      "gcloud compute ssh \"${first_four[$i]}\" \
-         --zone=\"$GROUP_ZONE\" \
-         -- -t '$ssh_command'"
+    # For even-numbered pane positions (starting a new row):
+    # Split vertically from the left pane of the previous row.
+    tmux select-pane -t "$row_left_pane"
+    # The -P flag makes tmux print the new pane id; -F formats the output.
+    new_left=$(tmux split-window -v -P -F "#{pane_id}" -t "$row_left_pane" \
+      "gcloud compute ssh \"${instance_names[i]}\" --zone=\"$GROUP_ZONE\" -- -t '$ssh_command'")
+    # Update the row_left_pane variable for the new row.
+    row_left_pane="$new_left"
   fi
 done
 
-# Attach to the newly created session (this blocks until you detach or exit tmux)
-tmux select-layout -t nvidia:gpu-monitor tiled
-tmux attach-session -t nvidia
+# Tidy up the layout. The "tiled" layout will re-arrange panes nicely.
+tmux select-layout -t "${SESSION}:${WINDOW}" tiled
+
+# Attach to the tmux session.
+tmux attach-session -t "$SESSION"

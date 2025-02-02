@@ -4,13 +4,12 @@ set -euo pipefail
 INSTANCE_GROUP="open-r1-2x"
 GROUP_ZONE="us-central1-c"
 
-echo "Fetching instance names from unmanaged instance group '$INSTANCE_GROUP' in zone '$GROUP_ZONE'..."
 instances=$(gcloud compute instance-groups unmanaged list-instances "$INSTANCE_GROUP" \
   --zone="$GROUP_ZONE" \
   --format="value(NAME) ")
 
 # Convert the whitespace-separated list of instance names into a Bash array.
-read -r -a instance_names <<< "$instances"
+read -r -a instance_names <<< ${instances[@]}
 
 echo "Found ${#instance_names[@]} instances:"
 printf "  %s\n" "${instance_names[@]}"
@@ -24,7 +23,7 @@ for instance in "${instance_names[@]}"; do
   # Using a filter on the instance name and zone to get the external IP.
   ip=$(gcloud compute instances list \
          --filter="name=(${instance}) AND zone:(${GROUP_ZONE})" \
-         --format="value(EXTERNAL_IP)")
+         --format="value(INTERNAL_IP)")
   instance_ips+=( "$ip" )
   echo "  $instance => $ip"
 done
@@ -55,6 +54,8 @@ trap cleanup INT TERM
 
 rank=0
 num_nodes=${#instance_names[@]}
+gpus_available=$(($num_nodes*8))
+
 # Start each SSH job in the background.
 for instance_name in "${instance_names[@]}"; do
   # If all are in the same zone, you can skip this next lookup.
@@ -72,10 +73,10 @@ for instance_name in "${instance_names[@]}"; do
   gcloud compute ssh "$instance_name" \
     --zone="$zone" \
     --command "source /etc/profile.d/env.sh && \
-      killall -9 /opt/conda/bin/python 2>/dev/null || true && \
+      killall -9 accelerate || true && \
       ulimit -n 10000 && \
       cd ~/open-r1 && \
-      ./scripts/train.sh --machine_rank=$rank --num_machines=$num_nodes --num_processes=$((8 * $num_nodes)) --master_ip=${instance_ips[0]}"
+      ./scripts/train.sh --machine_rank=$rank --num_machines=$num_nodes --num_processes=$(($gpus_available)) --main_process_ip=${instance_ips[0]} --main_process_port=6969"
   ) &
 
   # Capture the PID of this background job.
