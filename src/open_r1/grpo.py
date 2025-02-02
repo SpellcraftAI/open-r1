@@ -85,7 +85,8 @@ def accuracy_reward(completions, solution, **kwargs):
                 reward = float(verify(answer_parsed, gold_parsed))
                 print("ANSWER:", answer_parsed)
                 print("GOLD:", gold_parsed)
-                print("Reward: ", reward)
+                print("REWARD: ", reward)
+                print()
             except Exception as e:
                 print("Failed to verify answer: ", content)
                 print(e)

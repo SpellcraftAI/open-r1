@@ -2,7 +2,7 @@ source ~/.bashrc
 
 echo "Options:: $@"
 
-HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
+OP_NUM_THREADS=256 HF_HUB_ENABLE_HF_TRANSFER=1 ACCELERATE_LOG_LEVEL=info TRANSFORMERS_VERBOSITY=info accelerate launch \
     --config_file recipes/accelerate_configs/zero3.yaml \
     src/open_r1/grpo.py \
     --config recipes/qwen/Qwen2.5-1.5B-Instruct/grpo/confg_full.yaml
