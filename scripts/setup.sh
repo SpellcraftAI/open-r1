@@ -6,7 +6,7 @@ set -euo pipefail
 git push
 
 # The name of your unmanaged instance group
-INSTANCE_GROUP="open-r1-2x"
+INSTANCE_GROUP="cuda-121"
 # The zone that the instance group is in
 GROUP_ZONE="us-central1-c"
 
@@ -61,7 +61,7 @@ for instance_name in "${instance_names[@]}"; do
 
     echo 'Running git pull in ~/open-r1...'
     cd ~/open-r1
-    git reset HEAD --hard && git pull --no-rebase && \
+    git reset HEAD --hard && git pull origin multi-node-debug --no-rebase && \
     echo 'Updating machine_rank=$rank, main_process_ip=$master_ip in configs...' && \
     sed -i 's|^machine_rank: .*|machine_rank: $rank|'  ~/open-r1/recipes/accelerate_configs/* && \
     sed -i 's|^main_process_ip: .*|main_process_ip: $master_ip|'  ~/open-r1/recipes/accelerate_configs/*

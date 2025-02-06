@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-INSTANCE_GROUP="open-r1-2x"
+INSTANCE_GROUP="cuda-121"
 GROUP_ZONE="us-central1-c"
 
 echo "Fetching instance names from unmanaged instance group '$INSTANCE_GROUP' in zone '$GROUP_ZONE'..."
