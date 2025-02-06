@@ -74,15 +74,15 @@ for instance_name in "${instance_names[@]}"; do
   (
   gcloud compute ssh "$instance_name" \
     --zone="$zone" \
-    --command "source /etc/profile.d/env.sh &&
-      killall -9 accelerate || true &&
-      ulimit -n 10000 &&
-      cd ~/open-r1 &&
-      ./scripts/train.sh
-        --machine_rank=$rank
-        --num_machines=$num_nodes
-        --num_processes=$gpus_available
-        --main_process_ip=${instance_ips[0]}
+    --command "source /etc/profile.d/env.sh && \
+      killall -9 accelerate || true && \
+      ulimit -n 10000 && \
+      cd ~/open-r1 && \
+      ./scripts/train.sh \
+        --machine_rank=$rank \
+        --num_machines=$num_nodes \
+        --num_processes=$gpus_available \
+        --main_process_ip=${instance_ips[0]} \
         --main_process_port=6969"
   ) &
 
